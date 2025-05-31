@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Think Bot - Projects</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(
+                -45deg, 
+                var(--primary-color), 
+                var(--secondary-color),
+                #2ecc71,
+                #3498db
+            );
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: white;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background: var(--bg-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .project-card {
+            position: relative;
+            background: linear-gradient(
+                45deg, 
+                var(--card-bg),
+                rgba(74, 144, 226, 0.1),
+                rgba(243, 156, 18, 0.1),
+                var(--card-bg)
+            );
+            background-size: 300% 300%;
+            animation: gradientAnimation 15s ease infinite;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .project-card {
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+            pointer-events: none;
+        }
+
+        .project-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-buttons {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            transition: bottom 0.3s ease;
+        }
+
+        .project-card:hover .project-buttons {
+            bottom: 0;
+        }
+
+        .project-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(
+                90deg,
+                var(--primary-color),
+                var(--secondary-color),
+                var(--primary-color)
+            );
+            background-size: 200% auto;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .project-btn:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+        .project-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .project-link {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-tags .tag {
+            background: linear-gradient(
+                90deg,
+                var(--primary-color),
+                var(--secondary-color)
+            );
+            color: white;
+            animation: gradientAnimation 3s ease infinite;
+            background-size: 200% auto;
+        }
+
+        .project-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .project-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        @keyframes cardPop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .project-card {
+            animation: cardPop 0.5s ease forwards;
+        }
+
+        /* Search Bar */
+        .search-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px 24px;
+            border: 2px solid var(--primary-color);
+            border-radius: 30px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        /* Loading Animation */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .loading {
+            background: linear-gradient(90deg, 
+                var(--card-bg) 25%, 
+                rgba(255,255,255,0.1) 50%, 
+                var(--card-bg) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Animated Colors */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .project-card {
+            background: linear-gradient(
+                45deg, 
+                var(--card-bg),
+                rgba(74, 144, 226, 0.1),
+                rgba(243, 156, 18, 0.1),
+                var(--card-bg)
+            );
+            background-size: 300% 300%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+
+        .project-btn {
+            background: linear-gradient(
+                90deg,
+                var(--primary-color),
+                var(--secondary-color),
+                var(--primary-color)
+            );
+            background-size: 200% auto;
+            transition: all 0.3s ease;
+        }
+
+        .project-btn:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+        .project-tags .tag {
+            background: linear-gradient(
+                90deg,
+                var(--primary-color),
+                var(--secondary-color)
+            );
+            color: white;
+            animation: gradientAnimation 3s ease infinite;
+            background-size: 200% auto;
+        }
+
+        .header {
+            background: linear-gradient(
+                -45deg, 
+                var(--primary-color), 
+                var(--secondary-color),
+                #2ecc71,
+                #3498db
+            );
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>My Projects</h1>
+        <p>Exploring creativity through code</p>
+    </header>
+
+    <div class="filter-container">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Web</button>
+        <button class="filter-btn">Mobile</button>
+        <button class="filter-btn">AI</button>
+    </div>
+
+    <!-- Add Search Bar -->
+    <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Search projects..." id="searchInput">
+    </div>
+
+    <!-- Add Theme Toggle -->
+    <button onclick="toggleTheme()" class="theme-toggle" style="position: fixed; top: 20px; right: 20px;">
+        🌓
+    </button>
+
+    <div class="projects-grid">
+        <div class="project-card">
+            <div class="project-image-container">
+                <img src="project1.jpg" alt="Project 1" class="project-image">
+                <a href="https://thinkaibot.netlify.app/" class="project-link" target="_blank">View Live →</a>
+            </div>
+            <div class="project-info">
+                <h3>Think Bot AI</h3>
+                <p>An intelligent chatbot powered by machine learning</p>
+                <div class="project-tags">
+                    <span class="tag">AI</span>
+                    <span class="tag">Python</span>
+                </div>
+                <div class="project-buttons">
+                    <button class="project-btn" onclick="window.open('https://github.com/yourusername/project1')">
+                        <i class="fab fa-github"></i> Code
+                    </button>
+                    <button class="project-btn" onclick="window.open('https://demo-url.com')">
+                        <i class="fas fa-external-link-alt"></i> Demo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image-container">
+                <img src="project2.jpg" alt="Project 2" class="project-image">
+                <a href="#" class="project-link">View Live →</a>
+            </div>
+            <div class="project-info">
+                <h3>Portfolio Website</h3>
+                <p>Modern responsive portfolio showcase</p>
+                <div class="project-tags">
+                    <span class="tag">Web</span>
+                    <span class="tag">React</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image-container">
+                <img src="project3.jpg" alt="Project 3" class="project-image">
+                <a href="#" class="project-link">View Live →</a>
+            </div>
+            <div class="project-info">
+                <h3>Mobile App</h3>
+                <p>Cross-platform mobile application</p>
+                <div class="project-tags">
+                    <span class="tag">Mobile</span>
+                    <span class="tag">Flutter</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add new project cards -->
+        <div class="project-card">
+            <div class="project-image-container">
+                <img src="project4.jpg" alt="Project 4" class="project-image">
+                <a href="#" class="project-link">View Live →</a>
+            </div>
+            <div class="project-info">
+                <h3>E-Commerce Platform</h3>
+                <p>Full-featured online shopping platform with payment integration</p>
+                <div class="project-tags">
+                    <span class="tag">Web</span>
+                    <span class="tag">Node.js</span>
+                    <span class="tag">MongoDB</span>
+                </div>
+                <div class="project-stats">
+                    <span class="project-stat">👁️ 1.2k views</span>
+                    <span class="project-stat">⭐ 245 stars</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image-container">
+                <img src="project5.jpg" alt="Project 5" class="project-image">
+                <a href="#" class="project-link">View Live →</a>
+            </div>
+            <div class="project-info">
+                <h3>Weather App</h3>
+                <p>Real-time weather forecasting with beautiful visualizations</p>
+                <div class="project-tags">
+                    <span class="tag">API</span>
+                    <span class="tag">React</span>
+                </div>
+                <div class="project-stats">
+                    <span class="project-stat">👁️ 856 views</span>
+                    <span class="project-stat">⭐ 132 stars</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image-container">
+                <img src="project6.jpg" alt="Project 6" class="project-image">
+                <a href="#" class="project-link">View Live →</a>
+            </div>
+            <div class="project-info">
+                <h3>Task Manager</h3>
+                <p>Smart task management with AI-powered prioritization</p>
+                <div class="project-tags">
+                    <span class="tag">AI</span>
+                    <span class="tag">Vue.js</span>
+                </div>
+                <div class="project-stats">
+                    <span class="project-stat">👁️ 967 views</span>
+                    <span class="project-stat">⭐ 178 stars</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-button">🏠</a>
+
+    <script>
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        
+        // Add filtering functionality
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.textContent.toLowerCase();
+                const projectCards = document.querySelectorAll('.project-card');
+                
+                projectCards.forEach(card => {
+                    const tags = Array.from(card.querySelectorAll('.tag'))
+                        .map(tag => tag.textContent.toLowerCase());
+                    
+                    if (filter === 'all' || tags.includes(filter)) {
+                        card.style.display = 'block';
+                        card.style.animation = 'cardPop 0.5s ease forwards';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Search Functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', filterProjects);
+
+        function filterProjects() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const projects = document.querySelectorAll('.project-card');
+
+            projects.forEach(project => {
+                const title = project.querySelector('h3').textContent.toLowerCase();
+                const description = project.querySelector('p').textContent.toLowerCase();
+                const tags = Array.from(project.querySelectorAll('.tag'))
+                    .map(tag => tag.textContent.toLowerCase());
+
+                const matches = title.includes(searchTerm) || 
+                              description.includes(searchTerm) ||
+                              tags.some(tag => tag.includes(searchTerm));
+
+                project.style.display = matches ? 'block' : 'none';
+                if (matches) {
+                    project.style.animation = 'cardPop 0.5s ease forwards';
+                }
+            });
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        // Load Saved Theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Lazy Loading Images
+        const images = document.querySelectorAll('.project-image');
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('loading');
+                    observer.unobserve(img);
+                }
+            });
+        });
+
+        images.forEach(img => {
+            img.classList.add('loading');
+            imageObserver.observe(img);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THINK BOT | AI Text-to-Speech Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: #0B0C10;
+            color: #C5C6C7;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header Styles --- */
+        .header {
+            background: #1F2833;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo { display: flex; align-items: center; }
+        .logo-circle {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #66FCF1, #45A29E);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            margin-right: 1rem; box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .logo-circle:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(102, 252, 241, 0.5); }
+        .logo-circle span { font-size: 1.5rem; font-weight: bold; color: #1F2833; }
+        .header h1 {
+            color: #66FCF1; font-size: 1.8rem;
+            text-shadow: 0 0 5px rgba(102, 252, 241, 0.5), 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* --- Navigation Styles --- */
+        .nav-links { display: flex; gap: 1rem; list-style: none; flex-wrap: wrap; }
+        /* Make nav links behave like buttons for popup */
+        .nav-links li, .footer-links a {
+             cursor: pointer; /* Indicate clickable */
+        }
+        .nav-links a {
+            color: #C5C6C7; text-decoration: none; padding: 0.4rem 0.8rem;
+            border-radius: 20px; transition: all 0.3s ease; font-size: 0.9rem;
+            display: inline-block; /* Ensure padding works */
+        }
+        .nav-links a:hover {
+            background: #66FCF1; color: #1F2833; transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.4);
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1; display: flex; justify-content: center; align-items: center;
+            padding: 2rem 5%;
+        }
+        .tts-container {
+            background: #1F2833; padding: 2.5rem; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 15px rgba(102, 252, 241, 0.1);
+            width: 100%; max-width: 650px; margin: 2rem 0;
+            transition: box-shadow 0.3s ease;
+        }
+        .tts-container h2 {
+            color: #66FCF1; text-align: center; font-size: 2rem; margin-bottom: 2.5rem;
+            text-shadow: 0 0 8px rgba(102, 252, 241, 0.6);
+        }
+
+        /* --- Form Elements Styling --- */
+        label {
+            display: block; font-size: 0.9rem; font-weight: 500;
+            color: #C5C6C7; margin-bottom: 0.5rem;
+        }
+        textarea, select {
+            width: 100%; padding: 1rem; background-color: #0B0C10;
+            border: 1px solid #45A29E; border-radius: 10px; color: #C5C6C7;
+            font-size: 1rem; margin-bottom: 1.5rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        textarea { resize: vertical; min-height: 120px; }
+        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23C5C6C7' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; padding-right: 3rem; }
+        textarea:focus, select:focus {
+            outline: none; border-color: #66FCF1;
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.5), inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* --- Button Styling --- */
+        .button-controls {
+            display: flex; justify-content: center; gap: 1rem;
+            flex-wrap: wrap; margin-bottom: 1.5rem;
+        }
+        .tts-button, .stop-button, .download-button {
+            color: #1F2833; padding: 0.9rem 1.8rem; border: none;
+            border-radius: 10px; font-size: 1rem; cursor: pointer;
+            transition: all 0.3s ease; display: inline-flex; align-items: center;
+            gap: 0.6rem; font-weight: 600;
+        }
+        .tts-button {
+            background: linear-gradient(135deg, #66FCF1, #45A29E);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(102, 252, 241, 0.15);
+        }
+        .stop-button {
+            background: linear-gradient(135deg, #ff8a8a, #e06c6c);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(255, 138, 138, 0.2);
+        }
+         .download-button {
+            background: linear-gradient(135deg, #aaaaaa, #888888);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(150, 150, 150, 0.1);
+            opacity: 0.6; cursor: not-allowed;
+        }
+        .tts-button:hover:not(:disabled), .stop-button:hover:not(:disabled) { transform: translateY(-4px) scale(1.02); }
+        .tts-button:hover:not(:disabled) { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(102, 252, 241, 0.4); }
+        .stop-button:hover:not(:disabled) { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 107, 107, 0.4); }
+        .tts-button:disabled, .stop-button:disabled {
+            opacity: 0.6; cursor: not-allowed;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transform: none;
+        }
+        .stop-button:disabled { background: linear-gradient(135deg, #aaaaaa, #888888); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); }
+
+        /* --- Download Info Text --- */
+        .download-info { text-align: center; font-size: 0.8rem; color: #888; margin-top: -1rem; margin-bottom: 1.5rem; }
+
+        /* --- Status Message --- */
+        #statusMessage {
+            min-height: 1.5rem; text-align: center; font-size: 0.9rem; margin-bottom: 1.5rem;
+            transition: color 0.3s ease-in-out, text-shadow 0.3s ease;
+        }
+        .status-error { color: #ff6b6b; text-shadow: 0 0 5px rgba(255, 107, 107, 0.5); }
+        .status-success { color: #66FCF1; text-shadow: 0 0 5px rgba(102, 252, 241, 0.5); }
+        .status-info { color: #C5C6C7; text-shadow: none; }
+        .status-warning { color: #feca57; text-shadow: 0 0 5px rgba(254, 202, 87, 0.5); }
+
+        /* --- Audio Player Styling --- */
+        #audioPlayerContainer { margin-top: 1.5rem; }
+        #audioPlayerContainer.hidden { display: none; }
+        #audioPlayerContainer p { text-align: center; font-size: 0.9rem; margin-bottom: 0.5rem; color: #C5C6C7; }
+        audio { width: 100%; border-radius: 8px; filter: invert(95%) sepia(10%) saturate(200%) hue-rotate(140deg) brightness(100%) contrast(90%); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+
+        /* --- Footer Styles --- */
+        .footer {
+            background: #1F2833; padding: 2rem 5%; margin-top: auto; text-align: center;
+            color: #C5C6C7; border-top: 2px solid #66FCF1; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .footer-links a { color: #C5C6C7; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem; }
+        .footer-links a:hover { color: #66FCF1; transform: translateY(-2px); text-shadow: 0 0 8px rgba(102, 252, 241, 0.7); }
+        .social-icons { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; margin-bottom: 1rem; }
+        .social-icons a { color: #C5C6C7; font-size: 1.4rem; transition: all 0.3s ease; }
+        .social-icons a:hover { color: #66FCF1; transform: translateY(-3px) scale(1.15); text-shadow: 0 0 10px rgba(102, 252, 241, 0.6); }
+        .footer p { font-size: 0.85rem; }
+
+        /* --- Popup/Modal Styles --- */
+        #popupOverlay {
+            position: fixed; /* Stay in place */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 12, 16, 0.8); /* Dark overlay using body background color */
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top */
+            padding: 1rem; /* Add padding for smaller screens */
+            backdrop-filter: blur(5px); /* Optional blur effect */
+        }
+        #popupContent {
+            background: #1F2833; /* Match header/footer */
+            padding: 2.5rem;
+            border-radius: 15px;
+            max-width: 600px; /* Max width of popup */
+            width: 95%; /* Responsive width */
+            max-height: 85vh; /* Limit height */
+            overflow-y: auto; /* Enable scroll if content overflows */
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(102, 252, 241, 0.1); /* Enhanced shadow */
+            color: #C5C6C7;
+            border: 1px solid #45A29E; /* Subtle border */
+            animation: fadeInScale 0.3s ease-out; /* Add animation */
+        }
+        #popupClose {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem; /* Larger close icon */
+            font-weight: bold;
+            color: #C5C6C7;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+            line-height: 1; /* Adjust line height for better positioning */
+        }
+        #popupClose:hover {
+            color: #66FCF1; /* Highlight color on hover */
+            transform: scale(1.1);
+        }
+        #popupTitle {
+            color: #66FCF1; /* Accent color for title */
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(102, 252, 241, 0.5);
+        }
+        #popupBody {
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+        #popupBody p {
+            margin-bottom: 1rem; /* Spacing between paragraphs */
+        }
+        #popupBody h4 { /* For potential subheadings */
+             color: #66FCF1;
+             margin-top: 1.5rem;
+             margin-bottom: 0.5rem;
+        }
+
+        /* --- Popup Animation --- */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .header { justify-content: center; padding: 1rem 5%; }
+            .header h1 { font-size: 1.6rem; text-align: center; width: 100%; margin-top: 0.5rem; }
+            .nav-links { justify-content: center; gap: 0.5rem; margin-top: 0.5rem; }
+            .nav-links a { padding: 0.3rem 0.6rem; }
+            .tts-container { padding: 1.5rem; }
+            .tts-container h2 { font-size: 1.6rem; }
+            .tts-button, .stop-button, .download-button { padding: 0.8rem 1.5rem; font-size: 0.9rem; }
+            .footer { padding: 1.5rem 5%; }
+            .footer-links, .social-icons { gap: 1rem; }
+            #popupContent { padding: 1.5rem; max-height: 90vh; } /* Adjust padding for smaller popups */
+            #popupTitle { font-size: 1.5rem; }
+            #popupBody { font-size: 0.9rem; }
+            #popupClose { top: 0.8rem; right: 1rem; font-size: 1.8rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <div class="logo-circle"><span>TS</span></div>
+            <h1>AI Text-to-Speech</h1>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a onclick="openPopup('Home', 'Welcome to Prompt Minds! This is the main page of our AI Text-to-Speech demonstration tool. Explore the features below.')">Home</a></li>
+                <li><a onclick="openPopup('Features', 'This tool allows you to convert text into speech using your browser\'s built-in capabilities. Select from available voices and languages, enter your text, and click Generate Speech. You can also stop the playback.')">Features</a></li>
+                <li><a onclick="openPopup('Contact', '<h4>Get in Touch</h4><p>If you have questions or feedback, please reach out to us. We are always happy to help!</p><p>Email: contact@promptminds.example.com</p><p>Phone: +1 (555) 123-4567</p>')">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tts-container">
+            <h2>AI Text-to-Speech </h2>
+            <div class="mb-4">
+                <label for="inputText">Enter Text:</label>
+                <textarea id="inputText" name="inputText" rows="6" placeholder="Type or paste your text here..."></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="voiceSelect">Select Language/Voice:</label>
+                <select id="voiceSelect" name="voiceSelect"></select>
+            </div>
+            <div class="button-controls">
+                <button id="generateBtn" class="tts-button"><i class="fas fa-play" style="margin-right: 5px;"></i> Generate Speech</button>
+                <button id="stopBtn" class="stop-button" disabled><i class="fas fa-stop" style="margin-right: 5px;"></i> Stop</button>
+                <button id="downloadBtn" class="download-button" disabled><i class="fas fa-download" style="margin-right: 5px;"></i> Download</button>
+            </div>
+            <p class="download-info">(Download is not available with browser TTS. Requires server-side processing.)</p>
+            <div id="statusMessage" class="status-info">Select a voice and enter text.</div>
+            <div id="audioPlayerContainer" class="hidden">
+                <p>Generated Audio:</p>
+                <audio id="audioPlayer" controls>Your browser does not support the audio element.</audio>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a onclick="openPopup('Privacy Policy', '<h4>Our Commitment</h4><p>We value your privacy. This demo runs entirely in your browser using the built-in Speech Synthesis API. No text you enter is sent to our servers or stored by us.</p><h4>Browser Data</h4><p>Your browser may handle voice data according to its own privacy policies. We do not collect personal information through this tool.</p>')">Privacy Policy</a>
+            <a onclick="openPopup('Terms of Service', '<h4>Usage Agreement</h4><p>By using this Text-to-Speech demo, you agree to use it responsibly and lawfully. This tool is provided for demonstration purposes only.</p><h4>Limitations</h4><p>The quality and availability of voices depend on your browser and operating system. We do not guarantee the accuracy or suitability of the generated speech for any specific purpose.</p>')">Terms of Service</a>
+            <a onclick="openPopup('Contact Us', '<h4>Contact Information</h4><p>We welcome your inquiries. Please use the following methods to contact Prompt Minds:</p><p>Email: support@promptminds.example.com</p><p>Address: 123 Tech Avenue, Innovation City, IC 54321</p>')">Contact Us</a>
+        </div>
+        <div class="social-icons">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <p>&copy; 2025 Think bot. All rights reserved.</p>
+    </footer>
+
+    <div id="popupOverlay">
+        <div id="popupContent">
+            <span id="popupClose" onclick="closePopup()">&times;</span>
+            <h3 id="popupTitle">Popup Title</h3>
+            <div id="popupBody">
+                <p>Popup content goes here...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const inputText = document.getElementById('inputText');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const generateBtn = document.getElementById('generateBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        // Popup elements
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupTitle = document.getElementById('popupTitle');
+        const popupBody = document.getElementById('popupBody');
+        const popupClose = document.getElementById('popupClose');
+
+        let synth = window.speechSynthesis;
+        let voices = [];
+
+        // --- Popup Functions ---
+        function openPopup(title, content) {
+            popupTitle.textContent = title;
+            popupBody.innerHTML = content; // Use innerHTML to allow basic HTML in content
+            popupOverlay.style.display = 'flex'; // Show the popup
+            // Optional: Prevent body scroll when popup is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup() {
+            popupOverlay.style.display = 'none'; // Hide the popup
+            // Optional: Restore body scroll
+            document.body.style.overflow = '';
+        }
+
+        // Close popup if user clicks on the overlay (outside the content box)
+        popupOverlay.addEventListener('click', (event) => {
+            if (event.target === popupOverlay) { // Check if the click was directly on the overlay
+                closePopup();
+            }
+        });
+         // Close popup if user presses the Escape key
+         document.addEventListener('keydown', (event) => {
+             if (event.key === 'Escape' && popupOverlay.style.display === 'flex') {
+                 closePopup();
+             }
+         });
+
+
+        // --- Function to Populate Voice List ---
+        function populateVoiceList() {
+            // Guard against synth being unavailable after initial check
+             if (!synth) return;
+
+            voices = synth.getVoices().sort((a, b) => {
+                const aName = a.name.toUpperCase();
+                const bName = b.name.toUpperCase();
+                if (aName < bName) return -1;
+                if (aName > bName) return 1;
+                return 0;
+            });
+
+            const selectedIndex = voiceSelect.selectedIndex < 0 ? 0 : voiceSelect.selectedIndex;
+            voiceSelect.innerHTML = '';
+
+            const preferredLangs = ['hi', 'en', 'ur', 'ar', 'fr', 'es', 'it'];
+            let addedVoices = new Set();
+
+            preferredLangs.forEach(langPrefix => {
+                voices.forEach((voice) => {
+                    if (voice.lang.startsWith(langPrefix) && !addedVoices.has(voice.name)) {
+                        const option = document.createElement('option');
+                        option.textContent = `${voice.name} (${voice.lang})`;
+                        option.setAttribute('data-lang', voice.lang);
+                        option.setAttribute('data-name', voice.name);
+                        voiceSelect.appendChild(option);
+                        addedVoices.add(voice.name);
+                    }
+                });
+            });
+
+             voices.forEach((voice) => {
+                 if (!addedVoices.has(voice.name)) {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.setAttribute('data-lang', voice.lang);
+                    option.setAttribute('data-name', voice.name);
+                    voiceSelect.appendChild(option);
+                 }
+             });
+
+            voiceSelect.selectedIndex = selectedIndex;
+            generateBtn.disabled = voices.length === 0;
+             if (voices.length === 0 && synth) { // Check synth again
+                 updateStatus('No voices available in this browser.', 'error');
+             } else if (voices.length > 0) {
+                 updateStatus('Ready. Select a voice and enter text.', 'info');
+             }
+        }
+
+        // --- Function to Update Status Message ---
+        function updateStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-' + type;
+        }
+
+        // --- Initial Check & Voice Loading ---
+        if (synth) {
+            // Voices might load asynchronously, especially on some browsers
+            if (synth.getVoices().length > 0) {
+                 populateVoiceList();
+            } else if (synth.onvoiceschanged !== undefined) {
+                synth.onvoiceschanged = populateVoiceList;
+            } else {
+                 // Fallback for browsers that don't fire onvoiceschanged reliably
+                 setTimeout(populateVoiceList, 200);
+            }
+            stopBtn.disabled = !synth.speaking;
+        } else {
+            updateStatus('Sorry, your browser does not support text-to-speech.', 'error');
+            generateBtn.disabled = true;
+            stopBtn.disabled = true;
+            voiceSelect.disabled = true;
+        }
+
+        // --- Event Listener for Generate Button ---
+        generateBtn.addEventListener('click', () => {
+            // Guard against synth being unavailable
+            if (!synth) {
+                 updateStatus('Speech synthesis not available.', 'error');
+                 return;
+            }
+
+            const text = inputText.value.trim();
+            const selectedOption = voiceSelect.selectedOptions[0];
+
+            if (!text) { updateStatus('Please enter some text.', 'warning'); return; }
+            if (!selectedOption) { updateStatus('Please select a voice.', 'warning'); return; } // Check if an option is selected
+
+            const voiceName = selectedOption.getAttribute('data-name');
+            if (!voiceName) { updateStatus('Selected voice data is missing.', 'warning'); return; } // Check if data-name attribute exists
+
+
+            if (synth.speaking) { synth.cancel(); }
+
+            updateStatus('Generating speech...', 'info');
+
+            try {
+                const utterance = new SpeechSynthesisUtterance(text);
+                const selectedVoice = voices.find(voice => voice.name === voiceName);
+
+                if (selectedVoice) { utterance.voice = selectedVoice; }
+                else { updateStatus('Selected voice not found. Using default.', 'warning'); }
+
+                utterance.onstart = () => {
+                    updateStatus('Playing audio...', 'success');
+                    generateBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    console.log('Speech started');
+                };
+                utterance.onend = () => {
+                    updateStatus('Speech finished.', 'info');
+                    generateBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    console.log('Speech finished');
+                };
+                utterance.onpause = () => {
+                     updateStatus('Speech paused.', 'info');
+                     stopBtn.disabled = false;
+                     console.log('Speech paused');
+                 };
+                 utterance.onresume = () => {
+                     updateStatus('Playing audio...', 'success');
+                     console.log('Speech resumed');
+                 };
+                utterance.onerror = (event) => {
+                    let errorMsg = `An error occurred during speech synthesis.`;
+                    if (event && event.error) { errorMsg += ` Error: ${event.error}`; }
+                    updateStatus(errorMsg, 'error');
+                    generateBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    console.error('SpeechSynthesisUtterance.onerror', event);
+                };
+
+                synth.speak(utterance);
+
+            } catch (error) {
+                 updateStatus('Failed to initiate speech synthesis.', 'error');
+                 generateBtn.disabled = false;
+                 stopBtn.disabled = true;
+                 console.error('Error in speech synthesis setup:', error);
+            }
+        });
+
+        // --- Event Listener for Stop Button ---
+        stopBtn.addEventListener('click', () => {
+             // Guard against synth being unavailable
+             if (!synth) return;
+
+            if (synth.speaking) {
+                synth.cancel();
+                updateStatus('Speech stopped by user.', 'info');
+                generateBtn.disabled = false;
+                stopBtn.disabled = true;
+                console.log('Speech stopped by user');
+            }
+        });
+
+        // --- Prevent Page Unload Issues ---
+        window.addEventListener('beforeunload', () => {
+             // Guard against synth being unavailable
+             if (!synth) return;
+            if (synth.speaking) {
+                synth.cancel();
+            }
+        });
+
+        // --- Download Button (Disabled Functionality) ---
+        downloadBtn.addEventListener('click', () => {
+             updateStatus('Download not available with this demo setup.', 'warning');
+        });
+
+    </script>
+
+</body>
+</html>

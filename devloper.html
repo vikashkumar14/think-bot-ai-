@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Think Bot Developer - Vikash</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --bg-color: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .code-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        pre {
+            position: relative;
+            background-color: #2d2d2d;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin: 20px auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 10px 10px 20px #d9d9d9, -10px -10px 20px #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .dark-mode .feature-card {
+            background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+            box-shadow: 10px 10px 20px #151515, -10px -10px 20px #252525;
+        }        .nav-menu {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            position: fixed;
+            top: 70px;
+            left: -250px;
+            width: 250px;
+            max-height: calc(100vh - 140px);
+            z-index: 1000;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-radius: 0 15px 15px 0;
+            overflow-y: auto;
+        }
+
+        .dark-mode .nav-menu {
+            background: rgba(40, 40, 40, 0.95);
+        }
+
+        .nav-menu.active {
+            left: 0;
+        }
+
+        .nav-item {
+            display: block;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .social-icon {
+            font-size: 24px;
+            color: var(--primary-color);
+            transition: transform 0.3s;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .profile-image {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .header-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* AI Tools Section Styles */
+        .ai-tools-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .ai-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .ai-tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .ai-tool-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .ai-tool-icon {
+            font-size: 1.5em;
+        }
+
+        .menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            margin: 5px 0;
+            background: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .menu-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }        @media screen and (min-width: 769px) {
+            .menu-btn {
+                display: none;
+            }
+            .nav-menu {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                padding: 12px;
+                border-radius: 50px;
+                position: fixed;
+                bottom: 20px;
+                left: 50% !important;
+                transform: translateX(-50%);
+                width: auto;
+                height: auto;
+                top: auto;
+                max-height: none;
+                display: flex;
+                flex-direction: row;
+                gap: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                overflow: visible;
+            }
+            .dark-mode .nav-menu {
+                background: rgba(40, 40, 40, 0.3);
+            }
+            .nav-item {
+                padding: 8px 16px;
+                margin: 0;
+                border-radius: 25px;
+                font-size: 0.95rem;
+                color: var(--text-color);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .nav-item:hover {
+                transform: translateY(-2px);
+                background: var(--primary-color);
+                color: white;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .menu-btn {
+                display: block;
+            }
+            .container {
+                padding-top: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    
+    <button class="menu-btn" id="hamburgerMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="container fade-in">
+        <div class="header">
+            <img src="WhatsApp Image 2024-08-04 at 12.35.58_44947094.jpg" alt="Developer Profile" class="profile-image">
+            <div class="title-container">
+                <img src="ChatGPT Image Apr 30, 2025, 10_44_35 AM.png" alt="Think Bot Logo" class="header-logo">
+                <h1>Think Bot Developer</h1>
+            </div>
+            <p>Developed by: Vikash</p>
+        </div>
+
+        <div class="social-links">
+            <a href="https://thinkaibot.netlify.app/" class="social-icon">🌐</a>
+            <a href="#" class="social-icon">📱</a>
+            <a href="vikashkumar13228@gmail.com" class="social-icon">📧</a>
+            <a href="#" class="social-icon">💼</a>
+        </div>
+
+        <div class="features-section fade-in">
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>Theme Toggle</h3>
+                <p>Switch between light and dark modes for comfortable viewing in any environment.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>Code Copy Feature</h3>
+                <p>Easy one-click copy functionality for code snippets with visual feedback.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3>Animations</h3>
+                <p>Smooth fade-in animations and transitions for better user experience.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3>Code Highlighting</h3>
+                <p>Clear code display with syntax highlighting and proper formatting.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Responsive Design</h3>
+                <p>Fully responsive layout that works on all device sizes.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Modern UI</h3>
+                <p>Clean and modern interface with gradient effects and smooth animations.</p>
+            </div>
+
+            <!-- New Feature Cards -->
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Integration</h3>
+                <p>Advanced AI capabilities for intelligent responses and natural conversations.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Secure Chat</h3>
+                <p>End-to-end encryption and secure data handling for your privacy.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Fast Response</h3>
+                <p>Lightning-fast response times with optimized performance.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Multi-Language</h3>
+                <p>Support for multiple languages and international accessibility.</p>
+            </div>
+        </div>
+
+        <div class="code-section">
+            <h2>Sample Code</h2>
+            <pre><code>function helloWorld() {
+    console.log("Hello from Think Bot!");
+}</code></pre>
+        </div>
+
+        <div class="ai-tools-section fade-in">
+            <h2>AI Tools Integration</h2>
+            <div class="ai-tools-grid">
+                <a href="https://deepseek.ai" class="ai-tool-btn" target="_blank">
+                    <span class="ai-tool-icon">🤖</span>
+                    DeepSeek AI
+                </a>
+                <a href="https://aistudio.google.com/prompts/new_chat" class="ai-tool-btn" target="_blank">
+                    <span class="ai-tool-icon">🎯</span>
+                    Gemini AI
+                </a>
+                <a href="https://studio.firebase.google.com" class="ai-tool-btn" target="_blank">
+                    <span class="ai-tool-icon">🔥</span>
+                    Firebase AI
+                </a>
+                <a href="https://chatgpt.com" class="ai-tool-btn" target="_blank">
+                    <span class="ai-tool-icon">💡</span>
+                    ChatGPT
+                </a>
+                <a href="https://www.yourware.so" class="ai-tool-btn" target="_blank">
+                    <span class="ai-tool-icon">⚡</span>
+                    YourWare
+                </a>
+                <a href="https://lovable.dev" class="ai-tool-btn" target="_blank">
+                    <span class="ai-tool-icon">❤️</span>
+                    Lovable
+                </a>
+                <!-- Add Instagram AI -->
+                <a href="https://aistudio.instagram.com/?hl=en" class="ai-tool-btn" target="_blank">
+                    <span class="ai-tool-icon">📸</span>
+                    Instagram AI
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 Think Bot Developer. Created with 💖 by Vikash</p>
+        </footer>
+
+        <        <nav class="nav-menu">
+            <a href="index.html" class="nav-item">🏠 Home</a>
+            <a href="project.html" class="nav-item">💻 Projects</a>
+            <a href="blog.html" class="nav-item">📝 Blog</a>
+            <a href="contact.html" class="nav-item">📞 Contact</a>
+            <a href="about-us.html" class="nav-item">☹ About</a>
+        </nav>
+    </div>
+
+    <script>
+        // Inline JavaScript
+        document.addEventListener('DOMContentLoaded', function () {
+            // Find all code blocks
+            const codeBlocks = document.querySelectorAll('pre');
+
+            codeBlocks.forEach(function (codeBlock) {
+                // Create copy button
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy';
+                copyButton.classList.add('copy-button');
+
+                // Add copy button to code block
+                codeBlock.parentNode.insertBefore(copyButton, codeBlock);
+
+                // Add click listener to copy button
+                copyButton.addEventListener('click', function () {
+                    const code = codeBlock.querySelector('code').textContent;
+
+                    // Copy code to clipboard
+                    navigator.clipboard.writeText(code)
+                        .then(function () {
+                            // Provide user feedback
+                            copyButton.textContent = 'Copied!';
+                            setTimeout(function () {
+                                copyButton.textContent = 'Copy';
+                            }, 2000);
+                        })
+                        .catch(function (error) {
+                            console.error('Failed to copy code: ', error);
+                            copyButton.textContent = 'Error';
+                        });
+                });
+            });
+        });
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Add fade-in effect to elements as they appear in viewport
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        });
+
+        document.querySelectorAll('.code-section').forEach((el) => observer.observe(el));        // Hamburger menu toggle
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const navMenu = document.querySelector('.nav-menu');
+        
+        hamburgerMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburgerMenu.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && !hamburgerMenu.contains(e.target)) {
+                hamburgerMenu.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+        });
+
+        // Prevent menu from closing when clicking inside it
+        navMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>

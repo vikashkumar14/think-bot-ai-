@@ -1,0 +1,6 @@
+GeminiChatBot/
+├── index.html          ← UI Layout
+├── style.css           ← Glowing modern styles
+├── script.js           ← Frontend logic
+└── backend/
+    └── GeminiServer.java  ← Java backend to handle Gemini API securely
